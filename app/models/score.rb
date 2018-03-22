@@ -8,4 +8,12 @@ class Score < ApplicationRecord
   counter_culture :user,
                   deta_column: 'value',
                   column_name: 'daily_score_count'
+
+  after_save :set_latest_change
+
+  private
+
+  def set_latest_change
+    user.update_attribute(:latest_change, value)
+  end
 end

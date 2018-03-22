@@ -4,10 +4,11 @@ RSpec.describe 'scores', type: :request do
   describe 'scores' do
     let(:dinesh) { create(:user, name: 'Dinesh') }
     let(:gilfoyle) { create(:user, name: 'Gilfoyle') }
+    let(:richard) { create(:user, name: 'Richard') }
 
     describe 'scores#create' do
-      it 'creates a score' do
-        post_for_dinesh(2)
+      it 'creates a score and stores the latest change' do
+        points_for(dinesh, 2)
 
         expect(response).to have_http_status(201)
 
@@ -15,19 +16,22 @@ RSpec.describe 'scores', type: :request do
         expect(res['name']).to eq 'Dinesh'
         expect(res['daily_score']).to eq 2
         expect(res['daily_score_count']).to eq 1
+        expect(res['latest_change']).to eq 2
       end
     end
 
     describe 'scores#index' do
       it 'returns users with at least one daily_score_count' do
-        post_for_dinesh(2)
-        dinesh.reload
-        expect(dinesh.daily_score).to eq 2
-
-        post_for_dinesh(-2)
+        points_for(dinesh, 2)
+        points_for(dinesh, -2)
         dinesh.reload
         expect(dinesh.daily_score).to eq 0
         expect(dinesh.daily_score_count).to eq 2
+
+        points_for(richard, 1)
+        richard.reload
+        expect(richard.daily_score).to eq 1
+        expect(richard.daily_score_count).to eq 1
 
         gilfoyle.reload
         expect(gilfoyle.daily_score).to eq 0
@@ -38,13 +42,14 @@ RSpec.describe 'scores', type: :request do
 
         res = JSON.parse(response.body)
 
-        expect(res.length).to eq 1
-        expect(res.first['name']).to eq 'Dinesh'
+        expect(res.length).to eq 2
+        expect(res.first['name']).to eq 'Richard'
+        expect(res[1]['name']).to eq 'Dinesh'
       end
     end
   end
 
-  def post_for_dinesh(value)
-    post scores_path, params: { score: { user_id: dinesh.id, value: value } }
+  def points_for(user, value)
+    post scores_path, params: { score: { user_id: user.id, value: value } }
   end
 end

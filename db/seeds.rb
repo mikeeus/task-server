@@ -5,3 +5,22 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
+
+require 'net/http'
+require 'uri'
+
+uri = URI.parse('https://randomuser.me/api/?results=20')
+response = Net::HTTP.get_response(uri)
+
+JSON.parse(response.body)['results'].each do |user|
+  User.create(name: user.dig('name', 'first'),
+              avatar: user.dig('picture', 'medium'))
+end
+
+30.times do |i|
+  user_id = rand(20) + 1
+  user = User.find(user_id)
+  modifier =
+  value = rand(1000) * (rand(3) - 1)
+  Score.create(user: user, value: value) unless value.zero?
+end
