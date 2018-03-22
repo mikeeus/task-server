@@ -13,17 +13,19 @@ uri = URI.parse('https://randomuser.me/api/?results=20')
 response = Net::HTTP.get_response(uri)
 
 JSON.parse(response.body)['results'].each do |user|
-  User.create(name: user.dig('name', 'first'),
+  first = user.dig('name', 'first').capitalize
+  last = user.dig('name', 'last').capitalize
+  User.create(name: "#{first} #{last}" ,
               avatar: user.dig('picture', 'medium'))
 end
 
-30.times do |i|
+50.times do |i|
   user_id = rand(20) + 1
   user = User.find(user_id)
 
   modifier = (rand(3) - 1)
   value = rand(1000) * modifier
-  value /= 3 if modifier < 0
+  value /= 10 if modifier < 0
 
   Score.create(user: user, value: value) unless value.zero?
 end
