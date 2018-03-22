@@ -20,7 +20,10 @@ end
 30.times do |i|
   user_id = rand(20) + 1
   user = User.find(user_id)
-  modifier =
-  value = rand(1000) * (rand(3) - 1)
+
+  modifier = (rand(3) - 1)
+  value = rand(1000) * modifier
+  value /= 3 if modifier < 0
+
   Score.create(user: user, value: value) unless value.zero?
 end
