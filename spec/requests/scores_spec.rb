@@ -7,7 +7,7 @@ RSpec.describe 'scores', type: :request do
     let(:richard) { create(:user, name: 'Richard') }
 
     describe 'scores#create' do
-      it 'creates a score and stores the latest change' do
+      it 'creates a score' do
         points_for(dinesh, 2)
 
         expect(response).to have_http_status(201)
@@ -15,27 +15,23 @@ RSpec.describe 'scores', type: :request do
         res = JSON.parse(response.body)
         expect(res['name']).to eq 'Dinesh'
         expect(res['daily_score']).to eq 2
-        expect(res['daily_score_count']).to eq 1
-        expect(res['latest_change']).to eq 2
+        expect(res['latest_score']).to eq 2
       end
     end
 
     describe 'scores#index' do
-      it 'returns users with at least one daily_score_count' do
+      it 'returns users with at least one score today' do
         points_for(dinesh, 2)
         points_for(dinesh, -2)
         dinesh.reload
         expect(dinesh.daily_score).to eq 0
-        expect(dinesh.daily_score_count).to eq 2
 
         points_for(richard, 1)
         richard.reload
         expect(richard.daily_score).to eq 1
-        expect(richard.daily_score_count).to eq 1
 
         gilfoyle.reload
         expect(gilfoyle.daily_score).to eq 0
-        expect(gilfoyle.daily_score_count).to eq 0
 
         get scores_path
         expect(response).to have_http_status(200)
@@ -49,15 +45,12 @@ RSpec.describe 'scores', type: :request do
     end
 
     describe 'scores#scoreless' do
-      it 'returns users with 0 daily_score_count' do
+      it 'returns users with no scores today' do
         points_for(dinesh, 1)
         dinesh.reload
-        expect(dinesh.daily_score_count).to eq 1
 
         richard.reload
         gilfoyle.reload
-        expect(richard.daily_score_count).to eq 0
-        expect(gilfoyle.daily_score_count).to eq 0
 
         get scoreless_path
         expect(response).to have_http_status(200)
