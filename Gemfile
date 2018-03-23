@@ -12,8 +12,10 @@ gem 'rails', '~> 5.1.4'
 gem 'pg', '~> 0.18'
 # Use Puma as the app server
 gem 'puma', '~> 3.7'
-# Use counter_culture for counter cache
-gem 'counter_culture', '~> 1.8'
+# Use ActiveModelSerializers to serialize json
+gem 'active_model_serializers', '~> 0.10.0'
+# Use goldiloader for eager loading
+gem 'goldiloader'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 # gem 'jbuilder', '~> 2.5'
 # Use Redis adapter to run Action Cable in production
