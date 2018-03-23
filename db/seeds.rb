@@ -16,7 +16,7 @@ JSON.parse(response.body)['results'].each do |user|
   first = user.dig('name', 'first').capitalize
   last = user.dig('name', 'last').capitalize
   User.create(name: "#{first} #{last}" ,
-              avatar: user.dig('picture', 'medium'))
+              avatar: user.dig('picture', 'large'))
 end
 
 50.times do |i|
