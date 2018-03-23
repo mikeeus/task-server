@@ -2,7 +2,7 @@ class UsersController < ApplicationController
   before_action :set_user, only: :show
 
   def show
-    render json: { user: @user, scores: @user.scores }
+    render json: { user: ActiveModelSerializers::SerializableResource.new(@user), scores: @user.scores }
   end
 
   def index
