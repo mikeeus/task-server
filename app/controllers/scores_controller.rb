@@ -7,6 +7,10 @@ class ScoresController < ApplicationController
     render json: @leaderboard
   end
 
+  def scoreless
+    render json: User.scoreless
+  end
+
   # POST /scores
   def create
     @score = Score.new(score_params)

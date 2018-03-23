@@ -47,6 +47,26 @@ RSpec.describe 'scores', type: :request do
         expect(res[1]['name']).to eq 'Dinesh'
       end
     end
+
+    describe 'scores#scoreless' do
+      it 'returns users with 0 daily_score_count' do
+        points_for(dinesh, 1)
+        dinesh.reload
+        expect(dinesh.daily_score_count).to eq 1
+
+        richard.reload
+        gilfoyle.reload
+        expect(richard.daily_score_count).to eq 0
+        expect(gilfoyle.daily_score_count).to eq 0
+
+        get scoreless_path
+        expect(response).to have_http_status(200)
+
+        res = JSON.parse(response.body)
+        expect(res.length).to eq 2
+        expect(res.map{ |x| x['name'] }).to_not include 'Dinesh'
+      end
+    end
   end
 
   def points_for(user, value)
