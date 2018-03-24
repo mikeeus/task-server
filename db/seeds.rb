@@ -8,6 +8,7 @@
 
 require 'net/http'
 require 'uri'
+require 'score_generator'
 
 uri = URI.parse('https://randomuser.me/api/?results=20')
 response = Net::HTTP.get_response(uri)
@@ -19,13 +20,4 @@ JSON.parse(response.body)['results'].each do |user|
               avatar: user.dig('picture', 'large'))
 end
 
-50.times do |i|
-  user_id = rand(20) + 1
-  user = User.find(user_id)
-
-  modifier = (rand(3) - 1)
-  value = rand(1000) * modifier
-  value /= 10 if modifier < 0
-
-  Score.create(user: user, value: value) unless value.zero?
-end
+ScoreGenerator.new(100).generate
