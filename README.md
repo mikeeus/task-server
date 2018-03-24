@@ -31,7 +31,7 @@ scope(:scoreless, lambda {
 
 ## Reverser
 
-Reversing is done by a rails controller:
+Reversing is done by making a post request to `/reverse`. The request is handled by the `ReverseController`:
 
 ```ruby
 class ReverseController < ApplicationController
@@ -51,7 +51,7 @@ class ReverseController < ApplicationController
 end
 ```
 
-Routes:
+## Routes
 
 ```ruby
 resources :users, only: %i[index show]
@@ -71,7 +71,26 @@ Postgresql
 
 ## Tests
 
-Run the test suite with `rspec`
+Run the test suite with `rspec`. I wrote request specs because I think they succintly captures the behavior of the application.
+
+Example:
+
+```ruby
+describe 'reverse#reverse' do
+  it 'reverses a word' do
+    original_msg = 'reverse this!'
+    reversed = '!siht esrever'
+
+    post reverse_path, params: { message: original_msg }
+
+    res = JSON.parse(response.body)
+
+    expect(response).to have_http_status(200)
+    expect(res).to eq 'original' => { 'data' => original_msg },
+                      'message' => reversed
+  end
+end
+```
 
 ## Deployment instructions
 
