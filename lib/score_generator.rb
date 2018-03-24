@@ -1,6 +1,6 @@
 class ScoreGenerator
   def initialize(score_count = 50)
-    @score_count = score_count
+    @score_count = score_count || 50
     @pool = generate_user_pool
   end
 
@@ -24,6 +24,10 @@ class ScoreGenerator
   end
 
   def generate_user_pool
-    (1..20).to_a.sample(15)
+    user_count = User.count
+    pool_size = user_count * 2/3
+
+    ids = User.all.map(&:id)
+    ids.sample(pool_size)
   end
 end

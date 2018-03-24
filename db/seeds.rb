@@ -16,7 +16,7 @@ response = Net::HTTP.get_response(uri)
 JSON.parse(response.body)['results'].each do |user|
   first = user.dig('name', 'first').capitalize
   last = user.dig('name', 'last').capitalize
-  User.create(name: "#{first} #{last}" ,
+  User.create(name: "#{first} #{last}",
               avatar: user.dig('picture', 'large'))
 end
 

@@ -9,7 +9,7 @@ RSpec.describe 'scores', type: :request do
     describe 'scores#create' do
       it 'creates a score' do
         points_for(dinesh, 2)
-
+        reload_users
         expect(response).to have_http_status(201)
 
         res = JSON.parse(response.body)
@@ -23,14 +23,12 @@ RSpec.describe 'scores', type: :request do
       it 'returns users with at least one score today' do
         points_for(dinesh, 2)
         points_for(dinesh, -2)
-        dinesh.reload
-        expect(dinesh.daily_score).to eq 0
-
         points_for(richard, 1)
-        richard.reload
-        expect(richard.daily_score).to eq 1
 
-        gilfoyle.reload
+        reload_users
+
+        expect(dinesh.daily_score).to eq 0
+        expect(richard.daily_score).to eq 1
         expect(gilfoyle.daily_score).to eq 0
 
         get scores_path
@@ -47,10 +45,7 @@ RSpec.describe 'scores', type: :request do
     describe 'scores#scoreless' do
       it 'returns users with no scores today' do
         points_for(dinesh, 1)
-        dinesh.reload
-
-        richard.reload
-        gilfoyle.reload
+        reload_users
 
         get scoreless_path
         expect(response).to have_http_status(200)
@@ -60,6 +55,23 @@ RSpec.describe 'scores', type: :request do
         expect(res.map{ |x| x['name'] }).to_not include 'Dinesh'
       end
     end
+
+    describe 'scores#regenerate_scores' do
+      it 'removes existing scores and creates new ones' do
+        reload_users
+
+        post regenerate_scores_path, params: { score_count: 10 }
+        expect(Score.count).to eq 10
+        score_counts = [dinesh, richard, gilfoyle].map(&:scores).map(&:count)
+        expect(score_counts).to include 0
+      end
+    end
+  end
+
+  def reload_users
+    dinesh.reload
+    richard.reload
+    gilfoyle.reload
   end
 
   def points_for(user, value)
